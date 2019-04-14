@@ -1,5 +1,7 @@
 #include "plugin.h"
-#include <stdio.h>
+#include <iostream>
+#include <sstream>
+#include <string>
 
 
 DLL_EXPORT bool pluginit(PLUG_INITSTRUCT * initStruct)
@@ -73,38 +75,35 @@ DLL_EXPORT void CBMENUENTRY(CBTYPE cbType, PLUG_CB_MENUENTRY * info)
 // call when pause debug
 DLL_EXPORT void CBPAUSEDEBUG(CBTYPE cbType, void* reserved)
 {
-	SELECTIONDATA sel; // save selection data
-	REGDUMP dump; // save register data
-	char data[16];
+	if (g_record)
+	{
+		SELECTIONDATA sel; // save selection data
+		REGDUMP dump; // save register data
 
-	GuiSelectionGet(GUI_DISASSEMBLY, &sel);
-	DbgGetRegDumpEx(&dump, sizeof(dump)); // get data
+		std::ostringstream out[10];
 
-	sprintf_s(data, "%d", g_count + 1);
-	GuiReferenceSetCellContent(g_count, 0, data);
-	sprintf_s(data, "%x", sel.start);
-	GuiReferenceSetCellContent(g_count, 1, data);
+		GuiSelectionGet(GUI_DISASSEMBLY, &sel);
+		DbgGetRegDumpEx(&dump, sizeof(dump)); // get data
 
-	sprintf_s(data, "%x", dump.regcontext.cax);
-	GuiReferenceSetCellContent(g_count, 2, data);
-	sprintf_s(data, "%x", dump.regcontext.cbx);
-	GuiReferenceSetCellContent(g_count, 3, data);
-	sprintf_s(data, "%x", dump.regcontext.ccx);
-	GuiReferenceSetCellContent(g_count, 4, data);
-	sprintf_s(data, "%x", dump.regcontext.cdx);
-	GuiReferenceSetCellContent(g_count, 5, data);
-	sprintf_s(data, "%x", dump.regcontext.cbp);
-	GuiReferenceSetCellContent(g_count, 6, data);
-	sprintf_s(data, "%x", dump.regcontext.csp);
-	GuiReferenceSetCellContent(g_count, 7, data);
-	sprintf_s(data, "%x", dump.regcontext.csi);
-	GuiReferenceSetCellContent(g_count, 8, data);
-	sprintf_s(data, "%x", dump.regcontext.cdi);
-	GuiReferenceSetCellContent(g_count, 9, data);
+		out[0] << g_count + 1; // id
+		out[1] << sel.start; // address
+		out[2] << dump.regcontext.cax;
+		out[3] << dump.regcontext.cbx;
+		out[4] << dump.regcontext.ccx;
+		out[5] << dump.regcontext.cdx;
+		out[6] << dump.regcontext.cbp;
+		out[7] << dump.regcontext.csp;
+		out[8] << dump.regcontext.csi;
+		out[9] << dump.regcontext.cdi;
 
-	GuiReferenceReloadData(); // reload data
+		for (int i = 0; i < 10; i++)
+		{
+			GuiReferenceSetCellContent(g_count, i, _strdup(out[i].str().c_str()));
+		}
 
-	g_count += 1; // next line
+		GuiReferenceReloadData(); // reload data
+		g_count += 1; // next line
+	}
 }
 
 
