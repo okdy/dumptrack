@@ -47,8 +47,6 @@ DLL_EXPORT void plugsetup(PLUG_SETUPSTRUCT * setupStruct)
 	GuiReferenceAddColumn(COLUMN_SIZE, "ESI");
 	GuiReferenceAddColumn(COLUMN_SIZE, "EDI");
 
-	GuiReferenceSetRowCount(50);
-
 	_plugin_menuaddentry(g_hMenu, RECORD_START, RECORD_START_TITLE); // start record
 	_plugin_menuaddentry(g_hMenu, RECORD_STOP, RECORD_STOP_TITLE); // stop record
 }
@@ -96,6 +94,8 @@ DLL_EXPORT void CBPAUSEDEBUG(CBTYPE cbType, void* reserved)
 		out[8] << dump.regcontext.csi;
 		out[9] << dump.regcontext.cdi;
 
+		GuiReferenceSetRowCount(g_count + 1); // Add Row
+
 		for (int i = 0; i < 10; i++)
 		{
 			GuiReferenceSetCellContent(g_count, i, _strdup(out[i].str().c_str()));
@@ -110,7 +110,5 @@ DLL_EXPORT void CBPAUSEDEBUG(CBTYPE cbType, void* reserved)
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
-
-
 	return TRUE;
 }
