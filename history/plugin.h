@@ -1,4 +1,5 @@
 #include <Windows.h>
+#include <string>
 #include "pluginsdk/_plugins.h"
 
 
@@ -16,21 +17,25 @@
 #define RECORD_VIEW          2
 #define RECORD_VIEW_TITLE    "History View"
 
-#define COLUMN_SIZE          8
+#define COLUMN_DATA_SIZE     8
+#define COLUMN_ID_SIZE       4
 
 
 HWND g_hwndDlg; // global hwnd dialog
 
 DWORD g_dwProcessId; // get process id
 
-int g_record; // record state
-int g_count; // record count
+int g_record; // Record or not
+int g_count; // Record count
 
 int g_hMenu;
 int g_hMenuDisasm;
 int g_hMenuDump;
 int g_hMenuStack;
 int g_iPluginHandle;
+
+// guiReferenceAddColumn column list
+std::string gui_column_list[] = {"id", "ADDRESS", "EAX", "EBX", "ECX", "EDX", "ESP", "EBP", "ESI", "EDI"};
 
 
 extern "C"

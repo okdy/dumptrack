@@ -36,19 +36,13 @@ DLL_EXPORT void plugsetup(PLUG_SETUPSTRUCT * setupStruct)
 	g_hMenuStack = setupStruct->hMenuStack;
 
 	GuiReferenceInitialize(RECORD_VIEW_TITLE);
-	GuiReferenceAddColumn(4, "id");
-	GuiReferenceAddColumn(COLUMN_SIZE, "ADDRESS");
-	GuiReferenceAddColumn(COLUMN_SIZE, "EAX");
-	GuiReferenceAddColumn(COLUMN_SIZE, "EBX");
-	GuiReferenceAddColumn(COLUMN_SIZE, "ECX");
-	GuiReferenceAddColumn(COLUMN_SIZE, "EDX");
-	GuiReferenceAddColumn(COLUMN_SIZE, "EBP");
-	GuiReferenceAddColumn(COLUMN_SIZE, "ESP");
-	GuiReferenceAddColumn(COLUMN_SIZE, "ESI");
-	GuiReferenceAddColumn(COLUMN_SIZE, "EDI");
 
-	_plugin_menuaddentry(g_hMenu, RECORD_START, RECORD_START_TITLE); // start record
-	_plugin_menuaddentry(g_hMenu, RECORD_STOP, RECORD_STOP_TITLE); // stop record
+	// Add Column
+	for (int i = 0; i < gui_column_list->length; i++)
+		GuiReferenceAddColumn(COLUMN_DATA_SIZE, gui_column_list[i].c_str());
+
+	_plugin_menuaddentry(g_hMenu, RECORD_START, RECORD_START_TITLE); // Start record
+	_plugin_menuaddentry(g_hMenu, RECORD_STOP, RECORD_STOP_TITLE);   // Stop record
 }
 
 
@@ -83,8 +77,8 @@ DLL_EXPORT void CBPAUSEDEBUG(CBTYPE cbType, void* reserved)
 		GuiSelectionGet(GUI_DISASSEMBLY, &sel);
 		DbgGetRegDumpEx(&dump, sizeof(dump)); // get data
 
-		out[0] << g_count + 1; // id
-		out[1] << sel.start; // address
+		out[0] << g_count + 1;
+		out[1] << sel.start;
 		out[2] << dump.regcontext.cax;
 		out[3] << dump.regcontext.cbx;
 		out[4] << dump.regcontext.ccx;
@@ -97,12 +91,10 @@ DLL_EXPORT void CBPAUSEDEBUG(CBTYPE cbType, void* reserved)
 		GuiReferenceSetRowCount(g_count + 1); // Add Row
 
 		for (int i = 0; i < 10; i++)
-		{
 			GuiReferenceSetCellContent(g_count, i, _strdup(out[i].str().c_str()));
-		}
 
 		GuiReferenceReloadData(); // reload data
-		g_count += 1; // next line
+		g_count += 1;             // next line
 	}
 }
 
