@@ -12,7 +12,8 @@ DLL_EXPORT bool pluginit(PLUG_INITSTRUCT * initStruct)
 
 	g_iPluginHandle = initStruct->pluginHandle;
 
-	g_record = 0; // default setting
+	/* initialize record status and record count variable */
+	g_record = 0;
 	g_count = 0;
 
 	return true;
@@ -35,14 +36,16 @@ DLL_EXPORT void plugsetup(PLUG_SETUPSTRUCT * setupStruct)
 	g_hMenuDump = setupStruct->hMenuDump;
 	g_hMenuStack = setupStruct->hMenuStack;
 
+	/* set Reference view title */
 	GuiReferenceInitialize(RECORD_VIEW_TITLE);
 
-	// Add Column
+	/* Add column to reference view */
 	for (int i = 0; i < gui_column_list->length; i++)
 		GuiReferenceAddColumn(COLUMN_DATA_SIZE, gui_column_list[i].c_str());
 
-	_plugin_menuaddentry(g_hMenu, RECORD_START, RECORD_START_TITLE); // Start record
-	_plugin_menuaddentry(g_hMenu, RECORD_STOP, RECORD_STOP_TITLE);   // Stop record
+	/* add start, stop menu */
+	_plugin_menuaddentry(g_hMenu, RECORD_START, RECORD_START_TITLE);
+	_plugin_menuaddentry(g_hMenu, RECORD_STOP, RECORD_STOP_TITLE);
 }
 
 
@@ -53,32 +56,37 @@ DLL_EXPORT void CBMENUENTRY(CBTYPE cbType, PLUG_CB_MENUENTRY * info)
 	{
 	case RECORD_START:
 		g_record = 1;
-		_plugin_logputs("Record start!");
+		_plugin_logputs(RECORD_START_TITLE);
 		break;
 
 	case RECORD_STOP:
 		g_record = 0;
-		_plugin_logputs("Record stop!");
+		_plugin_logputs(RECORD_STOP_TITLE);
 		break;
 	}
 }
 
 
-// call when pause debug
+/* This function call when x64dbg debugging stop
+ */
 DLL_EXPORT void CBPAUSEDEBUG(CBTYPE cbType, void* reserved)
 {
 	if (g_record)
 	{
-		SELECTIONDATA sel; // save selection data
-		REGDUMP dump; // save register data
+		/* Gui selection data and register dump variable */
+		SELECTIONDATA selection;
+		REGDUMP dump;
 
 		std::ostringstream out[10];
 
-		GuiSelectionGet(GUI_DISASSEMBLY, &sel);
-		DbgGetRegDumpEx(&dump, sizeof(dump)); // get data
+		GuiSelectionGet(GUI_DISASSEMBLY, &selection);
 
+		/* get register dump */
+		DbgGetRegDumpEx(&dump, sizeof(dump));
+
+		/* set register dump data to ostringstream */
 		out[0] << g_count + 1;
-		out[1] << sel.start;
+		out[1] << selection.start;
 		out[2] << dump.regcontext.cax;
 		out[3] << dump.regcontext.cbx;
 		out[4] << dump.regcontext.ccx;
@@ -88,13 +96,16 @@ DLL_EXPORT void CBPAUSEDEBUG(CBTYPE cbType, void* reserved)
 		out[8] << dump.regcontext.csi;
 		out[9] << dump.regcontext.cdi;
 
-		GuiReferenceSetRowCount(g_count + 1); // Add Row
+		GuiReferenceSetRowCount(g_count + 1);
 
+		/* set data to cell */
 		for (int i = 0; i < 10; i++)
 			GuiReferenceSetCellContent(g_count, i, _strdup(out[i].str().c_str()));
 
-		GuiReferenceReloadData(); // reload data
-		g_count += 1;             // next line
+		GuiReferenceReloadData();
+
+		/* record count increase */
+		g_count += 1;
 	}
 }
 

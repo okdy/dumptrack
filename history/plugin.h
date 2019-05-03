@@ -3,7 +3,7 @@
 #include "pluginsdk/_plugins.h"
 
 
-#define DLL_EXPORT       __declspec(dllexport)
+#define DLL_EXPORT           __declspec(dllexport)
 
 #define PLUGIN_NAME          "Register History"
 #define PLUGIN_VERSION       1
@@ -17,16 +17,20 @@
 #define RECORD_VIEW          2
 #define RECORD_VIEW_TITLE    "History View"
 
+/* Reference view column width size */
 #define COLUMN_DATA_SIZE     8
 #define COLUMN_ID_SIZE       4
 
 
-HWND g_hwndDlg; // global hwnd dialog
+HWND g_hwndDlg;
 
-DWORD g_dwProcessId; // get process id
+DWORD g_dwProcessId;
 
-int g_record; // Record or not
-int g_count; // Record count
+/* record or not */
+int g_record;
+
+/* record count */
+int g_count;
 
 int g_hMenu;
 int g_hMenuDisasm;
@@ -34,7 +38,7 @@ int g_hMenuDump;
 int g_hMenuStack;
 int g_iPluginHandle;
 
-// guiReferenceAddColumn column list
+/* guiReferenceAddColumn column list */
 std::string gui_column_list[] = {"id", "ADDRESS", "EAX", "EBX", "ECX", "EDX", "ESP", "EBP", "ESI", "EDI"};
 
 
@@ -54,5 +58,4 @@ extern "C"
 }
 
 
-// Main
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved);
